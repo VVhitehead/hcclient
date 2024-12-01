@@ -42,6 +42,7 @@ class Client:
         self.online_users = []
         self.online_users_details = {}
         self.online_ignored_users = []
+        self.online_shared_hash_users = {}
 
         self.auto_complete_list = []
         self.manage_complete_list()
@@ -412,9 +413,36 @@ class Client:
                         if self.online_users_details[received["nick"]]["Hash"] in self.args["ignored"]["hashes"]:
                             self.online_ignored_users.append(received["nick"])
 
-                        self.print_msg("{}|{}| {}".format(termcolor.colored(packet_time, self.args["timestamp_color"]),
-                                                          termcolor.colored("SERVER", self.args["server_color"]),
-                                                          termcolor.colored(received["nick"] + " joined", self.args["server_color"])))
+                        if received["trip"] != "":
+                            self.print_msg("{}|{}| {} [ {} ] ⌈ {} ⌋ {}".format(termcolor.colored(packet_time, self.args["timestamp_color"]),
+                                                                               termcolor.colored("SERVER", self.args["server_color"]),
+                                                                               termcolor.colored(received["nick"], self.args["server_color"]),
+                                                                               termcolor.colored(received["trip"], self.args["client_color"]),
+                                                                               termcolor.colored(received["hash"], self.args["emote_color"]),
+                                                                               termcolor.colored("joined", self.args["server_color"])))
+                        else:
+                            self.print_msg("{}|{}| {} ⌈ {} ⌋ {}".format(termcolor.colored(packet_time, self.args["timestamp_color"]),
+                                                                        termcolor.colored("SERVER", self.args["server_color"]),
+                                                                        termcolor.colored(received["nick"], self.args["server_color"]),
+                                                                        termcolor.colored(received["hash"], self.args["emote_color"]),
+                                                                        termcolor.colored("joined", self.args["server_color"])))
+
+                        if received["hash"] not in self.online_shared_hash_users:
+                            self.online_shared_hash_users[received["hash"]] = [received["nick"]]
+                        # Only append if the nick isn't already in the list for this hash
+                        elif received["nick"] not in self.online_shared_hash_users[received["hash"]]:
+                            self.online_shared_hash_users[received["hash"]].append(received["nick"])
+                            # Strips current nickname from the list as its self-evident
+                            if len(self.online_shared_hash_users[received["hash"]]) > 1:
+                                self.online_shared_hash_users[received["hash"]].pop()
+                            refmt_nick_list = ' • '.join(self.online_shared_hash_users[received["hash"]])
+                            self.online_shared_hash_users[received["hash"]].append(received["nick"])  # re-append it to preserve the nick list
+                            # Print a list of users iff they join under different nicks using the same ip
+                            self.print_msg("{}|{}| {} has been  {} ".format(
+                                termcolor.colored(packet_time, self.args["timestamp_color"]),
+                                termcolor.colored("CLIENT", self.args["client_color"]),
+                                termcolor.colored(received["nick"], self.args["client_color"]),
+                                termcolor.colored(refmt_nick_list, self.args["emote_color"])))
 
                     case "onlineRemove":
                         try:
