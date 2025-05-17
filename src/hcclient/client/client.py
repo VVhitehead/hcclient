@@ -270,7 +270,8 @@ class Client:
                             self.online_users_details[user_details["nick"]] = {
                                 "Trip": user_details["trip"] if user_details["trip"] != "" else None,
                                 "Type": self.level_to_utype(user_details["level"]),
-                                "Hash": user_details["hash"]
+                                "Hash": user_details["hash"],
+                                "Flair": user_details["flair"]
                             }
 
                             if self.online_users_details[user_details["nick"]]["Trip"] in self.args["ignored"]["trips"]:
@@ -300,15 +301,16 @@ class Client:
                         match self.level_to_utype(received["level"]):
                             case "Mod":
                                 color_to_use = self.args["mod_nickname_color"] if self.nick != received["nick"] else self.args["self_nickname_color"]
-                                received["nick"] = f"{chr(11088)} {received['nick']}" if self.args["sheriff_badges"] and not self.args["no_unicode"] else received["nick"]
+                                received["nick"] = f"{chr(11088)} {received['nick']}" if self.args["flair"] and not self.args["no_unicode"] else received["nick"]
 
                             case "Admin":
                                 color_to_use = self.args["admin_nickname_color"] if self.nick != received["nick"] else self.args["self_nickname_color"]
-                                received["nick"] = f"{chr(11088)} {received['nick']}" if self.args["sheriff_badges"] and not self.args["no_unicode"] else received["nick"]
+                                received["nick"] = f"{chr(11088)} {received['nick']}" if self.args["flair"] and not self.args["no_unicode"] else received["nick"]
                                 tripcode = "Admin"
 
                             case _:
                                 color_to_use = self.args["nickname_color"] if self.nick != received["nick"] else self.args["self_nickname_color"]
+                                received["nick"] = f"{received['flair']} {received['nick']}" if self.args["flair"] and received['flair'] != False and not self.args["no_unicode"] else received["nick"]
 
                         if f"@{self.nick}" in received["text"]:
                             self.push_notification(f"[{received['nick']}] {received['text']}")
@@ -401,7 +403,8 @@ class Client:
                         self.online_users_details[received["nick"]] = {
                             "Trip": received["trip"] if received["trip"] != "" else None,
                             "Type": self.level_to_utype(received["level"]),
-                            "Hash": received["hash"]
+                            "Hash": received["hash"],
+                            "Flair": received["flair"]
                         }
 
                         self.manage_complete_list()

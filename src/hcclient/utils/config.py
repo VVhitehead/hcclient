@@ -18,7 +18,7 @@ default_config = {
     "clear": False,
     "is_mod": False,
     "no_unicode": False,
-    "sheriff_badges": False,
+    "flair": False,
     "highlight_theme": "monokai",
     "no_markdown": False,
     "no_linkify": False,
@@ -90,7 +90,7 @@ def load_config(filepath: str) -> dict:
                                   "warning_color", "server_color", "client_color",
                                   "timestamp_color", "mod_nickname_color", "suggest_aggr",
                                   "admin_nickname_color", "ignored", "aliases", "proxy", "latex",
-                                  "backticks_bg", "ssl_no_verify", "no_linkify", "sheriff_badges",
+                                  "backticks_bg", "ssl_no_verify", "no_linkify", "flair",
                                   "no_highlight",  # deprecated
                                   ):
                     unknown_args.append(option)
@@ -196,7 +196,7 @@ def validate_config(option: str, value: str) -> bool:
         passed = value in termcolor.COLORS
 
     elif option in ("no_unicode", "no_notify", "no_parse", "clear", "is_mod", "no_markdown",
-                    "latex", "ssl_no_verify", "no_linkify", "sheriff_badges"):
+                    "latex", "ssl_no_verify", "no_linkify", "flair"):
         passed = isinstance(value, bool)
 
     elif option in ("websocket_address", "trip_password", "prompt_string", "timestamp_format"):

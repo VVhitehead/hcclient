@@ -101,6 +101,9 @@ Moderator commands:
   /lockroom
   /unlockroom
   /forcecolor <nick> <color>
+  /forceflair <nick> <single utf flair>
+    Forces a utf-8 character as a flair onto a
+    connection.
   /anticmd
   /uwuify <nick> [nick2] [nick3]..."""
             footer_text = "\n\nRun `/help server` to read the server help text."
@@ -424,9 +427,19 @@ Moderator commands:
     def unlockroom(client: object, args_string: str) -> None:
         client.send({"cmd": "unlockroom"})
 
+    def forceflair(client: object, args_string: str) -> None:
+        args = args_string.split(" ")
+        if len(args) == 2 and (isinstance(args[1], str) and len(args[1]) == 1):
+            client.send({"cmd": "forceflair", "nick": args[0].lstrip("@"), "flair": args[1]})
+
+        else:
+            client.print_msg("{}|{}| {}".format(termcolor.colored(client.formatted_datetime(), client.args["timestamp_color"]),
+                                                termcolor.colored("CLIENT", client.args["client_color"]),
+                                                termcolor.colored("Invalid User/Flair", client.args["client_color"])))
+
     def forcecolor(client: object, args_string: str) -> None:
         args = args_string.split(" ")
-        if len(args) > 1:
+        if len(args) == 2:
             client.send({"cmd": "forcecolor", "nick": args[0].lstrip("@"), "color": args[1]})
 
         else:
@@ -478,6 +491,7 @@ Moderator commands:
         "/disablecaptcha": disablecaptcha,
         "/lockroom": lockroom,
         "/unlockroom": unlockroom,
+        "/forceflair": forceflair,
         "/forcecolor": forcecolor,
         "/anticmd": anticmd,
         "/uwuify": uwuify
