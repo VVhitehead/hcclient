@@ -310,7 +310,7 @@ class Client:
 
                             case _:
                                 color_to_use = self.args["nickname_color"] if self.nick != received["nick"] else self.args["self_nickname_color"]
-                                received["nick"] = f"{received['flair']} {received['nick']}" if self.args["flair"] and received['flair'] != False and not self.args["no_unicode"] else received["nick"]
+                                received["nick"] = f"{received['flair']} {received['nick']}" if self.args["flair"] and received['flair'] and not self.args["no_unicode"] else received["nick"]
 
                         if f"@{self.nick}" in received["text"]:
                             self.push_notification(f"[{received['nick']}] {received['text']}")
